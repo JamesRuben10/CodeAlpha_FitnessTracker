@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaEdit, FaTrash, FaPlus, FaBolt, FaClock, FaFire } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import API_URL from '../config/api';
 
 const ActivityList = () => {
   const [activities, setActivities] = useState([]);
@@ -17,7 +18,7 @@ const ActivityList = () => {
 
   const fetchActivities = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/activities');
+      const res = await axios.get(`${API_URL}/activities`);
       setActivities(res.data);
       setLoading(false);
     } catch (error) {
@@ -30,7 +31,7 @@ const ActivityList = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this activity?')) {
       try {
-        await axios.delete(`http://localhost:5000/api/activities/${id}`);
+        await axios.delete(`${API_URL}/activities/${id}`);
         setActivities(activities.filter(a => a._id !== id));
       } catch (error) {
         setError('Failed to delete activity');
@@ -52,7 +53,7 @@ const ActivityList = () => {
 
   const handleUpdate = async (id) => {
     try {
-      const res = await axios.put(`http://localhost:5000/api/activities/${id}`, {
+      const res = await axios.put(`${API_URL}/activities/${id}`, {
         ...editForm,
         duration: Number(editForm.duration),
         caloriesBurned: Number(editForm.caloriesBurned),

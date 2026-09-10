@@ -14,6 +14,7 @@ import {
   Legend
 } from 'chart.js';
 import { FaRunning, FaFire, FaShoePrints, FaClock, FaArrowUp, FaBullseye, FaShareAlt } from 'react-icons/fa';
+import API_URL from '../config/api';
 
 ChartJS.register(
   CategoryScale,
@@ -33,7 +34,7 @@ const Dashboard = () => {
   const shareCardRef = useRef(null);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/activities/week')
+    axios.get(`${API_URL}/activities/week`)
       .then(response => {
         setWeeklyData(response.data);
         updateUser({ achievements: response.data.achievements, streak: response.data.streak });

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from './AuthContext';
+import API_URL from '../config/api';
 
 const ThemeContext = createContext();
 
@@ -25,7 +26,7 @@ export const ThemeProvider = ({ children }) => {
     updateUser({ theme: nextTheme });
     if (user) {
       try {
-        await axios.put('http://localhost:5000/api/auth/theme', { theme: nextTheme });
+        await axios.put(`${API_URL}/auth/theme`, { theme: nextTheme });
       } catch (error) {
         console.error('Could not save theme:', error);
       }

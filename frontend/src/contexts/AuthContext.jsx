@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
 import axios from 'axios';
+import API_URL from '../config/api';
 
 const AuthContext = createContext();
 
@@ -10,8 +11,6 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const authRequestId = useRef(0);
-
-  const API_URL = 'http://localhost:5000/api';
 
   // Set auth token
   const setAuthToken = (token) => {

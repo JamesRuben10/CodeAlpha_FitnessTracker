@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import API_URL from '../config/api';
 
 const AddActivity = () => {
   const [formData, setFormData] = useState({
@@ -33,7 +34,7 @@ const AddActivity = () => {
     setLoading(true);
     
     try {
-      const response = await axios.post('http://localhost:5000/api/activities', {
+      const response = await axios.post(`${API_URL}/activities`, {
         ...formData,
         duration: Number(formData.duration),
         caloriesBurned: Number(formData.caloriesBurned),
