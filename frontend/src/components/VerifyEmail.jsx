@@ -9,6 +9,7 @@ const VerifyEmail = () => {
   const [email, setEmail] = useState(location.state?.email || '');
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
   const [notice, setNotice] = useState('');
 
   useEffect(() => {
@@ -25,12 +26,15 @@ const VerifyEmail = () => {
   };
 
   const handleResend = async () => {
+    if (resendLoading) return;
+    setResendLoading(true);
     setNotice('');
     const result = await resendVerification(email);
     if (result.success) {
       setError(null);
       setNotice(result.message);
     }
+    setResendLoading(false);
   };
 
   return (
@@ -62,7 +66,9 @@ const VerifyEmail = () => {
             {loading ? 'Verifying...' : 'Verify email'}
           </button>
         </form>
-        <button type="button" className="resend-button" onClick={handleResend}>Didn’t receive it? Resend code</button>
+        <button type="button" className="resend-button" onClick={handleResend} disabled={resendLoading}>
+          {resendLoading ? 'Sending code...' : 'Didn’t receive it? Resend code'}
+        </button>
         <p className="auth-link">Already verified? <Link to="/login">Return to login</Link></p>
       </div>
     </div>

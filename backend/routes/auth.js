@@ -31,6 +31,9 @@ const sendVerificationEmail = async (user, code) => {
     port: Number(process.env.SMTP_PORT || 587),
     secure: process.env.SMTP_SECURE === 'true',
     family: 4,
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 10000,
     auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
   });
 
@@ -78,7 +81,8 @@ router.post('/register', async (req, res) => {
       email: user.email
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('Registration email error:', error.message);
+    res.status(500).json({ message: 'Account created, but the verification email could not be sent. Please try Resend code in a moment.' });
   }
 });
 
@@ -121,7 +125,8 @@ router.post('/login', async (req, res) => {
       token: generateToken(user.id)
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('Resend verification email error:', error.message);
+    res.status(502).json({ message: 'The verification email service is temporarily unavailable. Please try again shortly.' });
   }
 });
 
