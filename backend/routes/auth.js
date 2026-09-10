@@ -76,7 +76,7 @@ router.post('/register', async (req, res) => {
   try {
     const { name, password } = req.body;
     const email = req.body.email?.trim().toLowerCase();
-    const demoEmail = process.env.DEMO_EMAIL?.trim().toLowerCase();
+    const demoEmail = (process.env.DEMO_EMAIL || 'fitnesstracker0567@gmail.com').trim().toLowerCase();
     const isDemoAccount = Boolean(demoEmail && email === demoEmail);
 
     // Check if user exists
