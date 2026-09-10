@@ -20,6 +20,29 @@ const hashVerificationCode = (code) => crypto
   .digest('hex');
 
 const sendVerificationEmail = async (user, code) => {
+  if (process.env.RESEND_API_KEY) {
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: process.env.EMAIL_FROM,
+        to: [user.email],
+        subject: 'Your Fitness Tracker verification code',
+        text: `Hi ${user.name}, your Fitness Tracker verification code is ${code}. It expires in 15 minutes.`
+      })
+    });
+
+    if (!response.ok) {
+      const details = await response.text();
+      throw new Error(`Resend email API failed (${response.status}): ${details}`);
+    }
+
+    return { sent: true, configured: true };
+  }
+
   if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
     console.warn(`[DEV] Email is not configured. Verification code for ${user.email}: ${code}`);
     return { sent: false, configured: false };
@@ -82,7 +105,7 @@ router.post('/register', async (req, res) => {
     });
   } catch (error) {
     console.error('Registration email error:', error.message);
-    res.status(500).json({ message: 'Account created, but the verification email could not be sent. Please try Resend code in a moment.' });
+    res.status(500).json({ message: 'Account created, but the verification email could not be sent. Check the email provider configuration and try Resend code.' });
   }
 });
 
