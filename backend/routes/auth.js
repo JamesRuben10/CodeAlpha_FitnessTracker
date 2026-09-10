@@ -72,6 +72,7 @@ const sendVerificationEmail = async (user, code) => {
 // @route   POST /api/auth/register
 // @desc    Register a new user
 router.post('/register', async (req, res) => {
+  let createdUser;
   try {
     const { name, password } = req.body;
     const email = req.body.email?.trim().toLowerCase();
@@ -85,7 +86,7 @@ router.post('/register', async (req, res) => {
     const verificationCode = createVerificationCode();
 
     // Create user
-    const user = await User.create({
+    createdUser = await User.create({
       name,
       email,
       password,
@@ -94,18 +95,19 @@ router.post('/register', async (req, res) => {
       verificationExpires: new Date(Date.now() + 15 * 60 * 1000)
     });
 
-    const emailResult = await sendVerificationEmail(user, verificationCode);
+    const emailResult = await sendVerificationEmail(createdUser, verificationCode);
 
     res.status(201).json({
       message: emailResult.sent
         ? 'We sent a verification code to your email.'
         : 'Your account was created, but email delivery is not configured. Configure SMTP, then use Resend code.',
       verificationRequired: true,
-      email: user.email
+      email: createdUser.email
     });
   } catch (error) {
+    if (createdUser?._id) await User.deleteOne({ _id: createdUser._id });
     console.error('Registration email error:', error.message);
-    res.status(500).json({ message: 'Account created, but the verification email could not be sent. Check the email provider configuration and try Resend code.' });
+    res.status(502).json({ message: 'We could not send the verification email. Please check the email address and try registering again.' });
   }
 });
 
