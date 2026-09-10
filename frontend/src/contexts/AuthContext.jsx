@@ -54,6 +54,10 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     try {
       const res = await axios.post(`${API_URL}/auth/register`, userData);
+      if (res.data.token) {
+        setAuthToken(res.data.token);
+        setUser(res.data);
+      }
       setError(null);
       return { success: true, verificationRequired: res.data.verificationRequired, email: res.data.email };
     } catch (error) {

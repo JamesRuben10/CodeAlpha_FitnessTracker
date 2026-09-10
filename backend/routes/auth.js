@@ -76,6 +76,8 @@ router.post('/register', async (req, res) => {
   try {
     const { name, password } = req.body;
     const email = req.body.email?.trim().toLowerCase();
+    const demoEmail = process.env.DEMO_EMAIL?.trim().toLowerCase();
+    const isDemoAccount = Boolean(demoEmail && email === demoEmail);
 
     // Check if user exists
     const userExists = await User.findOne({ email });
@@ -90,10 +92,25 @@ router.post('/register', async (req, res) => {
       name,
       email,
       password,
-      isVerified: false,
+      isVerified: isDemoAccount,
       verificationCodeHash: hashVerificationCode(verificationCode),
       verificationExpires: new Date(Date.now() + 15 * 60 * 1000)
     });
+
+    if (isDemoAccount) {
+      return res.status(201).json({
+        message: 'Demo account created successfully.',
+        verificationRequired: false,
+        _id: createdUser.id,
+        name: createdUser.name,
+        email: createdUser.email,
+        dailyGoal: createdUser.dailyGoal,
+        theme: createdUser.theme,
+        achievements: createdUser.achievements,
+        streak: createdUser.streak,
+        token: generateToken(createdUser.id)
+      });
+    }
 
     const emailResult = await sendVerificationEmail(createdUser, verificationCode);
 
